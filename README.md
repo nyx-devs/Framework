@@ -1,97 +1,173 @@
-# Ro-School Framework — Full Setup Guide
+# Ro-School Framework
 
-Open-source website + Discord bot + Roblox integration for **Roblox Ro-Schools**.
+A complete open-source framework for building and running **Roblox school communities**.
 
-Stack: **Next.js 15**, **Supabase**, **Discord.js**, **Roblox Open Cloud**.
+Ro-School connects three parts of your community into one system:
 
-> This is **not** a real registered school. Configure the RP notice for your community.  
-> **Never commit secrets** (`.env`, tokens, service role keys) to GitHub.
+- **Website** — public site, accounts, applications, staff portal, sessions, mail and administration
+- **Discord bot** — applications, notifications, DMs, staff tools, logs and server integration
+- **Roblox** — ranks, permissions, sessions, staff tools and in-game systems
 
----
+The framework is designed to be **configured for your own school**, not rebuilt from scratch every time.
 
-## Table of contents
+> **Ro-School is an RP/community framework, not a real registered school.**  
+> Configure the RP notice, branding and policies for your own community.
 
-1. [What you get](#1-what-you-get)
-2. [Requirements](#2-requirements)
-3. [Clone & install](#3-clone--install)
-4. [Environment variables](#4-environment-variables)
-5. [Supabase setup](#5-supabase-setup)
-6. [Discord app & bot](#6-discord-app--bot)
-7. [Run the website](#7-run-the-website)
-8. [Run the Discord bot](#8-run-the-discord-bot)
-9. [Roblox setup](#9-roblox-setup)
-10. [Sessions timetable](#10-sessions-timetable)
-11. [Staff applications & DMs](#11-staff-applications--dms)
-12. [Deploy (Vercel + bot host)](#12-deploy-vercel--bot-host)
-13. [Permissions & security](#13-permissions--security)
-14. [Troubleshooting](#14-troubleshooting)
-15. [Project structure](#15-project-structure)
+**Stack:** Next.js 15 · Supabase · Discord.js · Roblox Open Cloud · Roblox Lua
 
 ---
 
-## 1. What you get
+## What Ro-School does
 
-| Piece | Purpose |
-|--------|---------|
-| **Website** | Public school site, student portal, staff portal, applications, merits, sessions, mail, safeguarding |
-| **Supabase** | Auth, database, RLS |
-| **Discord bot** (`bot/`) | Slash commands, accept/reject DMs, apply embed, staff database flow |
-| **Roblox scripts** (`roblox/`) | In-game merit awarding (staff GUI) |
+```text
+                    Ro-School Framework
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+       Website            Discord              Roblox
+          │                   │                   │
+   Applications         Bot commands         In-game tools
+   Staff portal         DMs                  Permissions
+   Accounts             Notifications        Ranks
+   Sessions             Logs                 Sessions
+   Mail                 Staff tools          Staff GUIs
+   Administration       Application embeds   API integration
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                           Supabase
+                      Auth + Database
+```
+
+Everything shares the same backend so your website, Discord server and Roblox experience can work together.
+
+### Website
+
+- Public school website
+- Student and staff accounts
+- Authentication (email + Discord OAuth)
+- Staff applications and management
+- Staff database
+- Sessions and timetable
+- Student dashboard
+- School mail
+- Merits
+- Safeguarding tools
+- Administration
+- Roblox / Discord integration
+
+### Discord
+
+The included Discord bot provides:
+
+- Slash commands
+- Application notifications
+- Accept / reject DMs
+- Staff database workflows
+- Application embeds
+- Automated notifications
+- Server tools
+- Database and website integration
+
+### Roblox
+
+The Roblox side can provide:
+
+- Group rank integration
+- Permission checks
+- Staff tools
+- Sessions
+- In-game merits
+- Staff GUIs
+- Website API integration
+- Roblox Open Cloud integration
 
 ---
 
-## 2. Requirements
+## 1. Requirements
 
-- Node.js **20+** (18+ may work)
-- npm
-- A [Supabase](https://supabase.com) project
-- A [Discord application](https://discord.com/developers/applications) (bot + OAuth)
-- Optional: Roblox group + Open Cloud API key + experience
-- Optional: [Vercel](https://vercel.com) for the website; a always-on host for the bot (Railway, Render, VPS, your PC)
+Before installing Ro-School you will need:
+
+- **Node.js 20+**
+- **npm**
+- A **Supabase** project
+- A **Discord application / bot**
+- A Roblox group and experience (for Roblox features)
+
+Optional:
+
+- **Vercel** for the website
+- A VPS, Railway, Render or another always-on host for the Discord bot
+- Roblox Open Cloud API access
+
+### Recommended tools
+
+- Git
+- VS Code
+- Roblox Studio
+- Discord Developer Mode enabled
 
 ---
 
-## 3. Clone & install
+## 2. Clone and install
 
 ```bash
-git clone https://github.com/eqeno/roschool-framework.git
-cd roschool-framework
+git clone https://github.com/nyx-devs/Framework.git
+cd Framework
+```
 
-# Website
+Install the website dependencies:
+
+```bash
 npm install
+```
 
-# Discord bot
+Install the Discord bot dependencies:
+
+```bash
 cd bot
 npm install
 cd ..
 ```
 
-If your zip folder is still named `bluebird-school`, rename it:
+You should now have a layout similar to:
 
-```bash
-mv bluebird-school roschool-framework
-cd roschool-framework
+```text
+Framework/
+├── src/
+├── bot/
+├── roblox/
+├── supabase/
+└── package.json
 ```
 
 ---
 
-## 4. Environment variables
+## 3. Environment variables
 
-### Website — copy template
+Ro-School uses environment variables for secrets and configuration.
+
+**Never commit real `.env` files to GitHub.**
+
+### Website
 
 ```bash
 cp .env.example .env.local
 ```
 
-### Bot — copy template
+### Discord bot
 
 ```bash
 cp bot/.env.example bot/.env
 ```
 
-Use the **same** Supabase URL and **service role** key in both website and bot.
+Use the **same** Supabase URL and service role key for both website and bot.
 
-### Branding (public)
+---
+
+### School branding
+
+Configure identity in `.env.local`:
 
 ```env
 NEXT_PUBLIC_SCHOOL_NAME=Your Ro-School Name
@@ -110,27 +186,44 @@ NEXT_PUBLIC_ROBLOX_GROUP_URL=
 NEXT_PUBLIC_SCHOOL_EMAIL_DOMAIN=school.local
 ```
 
+These values let you rebrand without rewriting the application.
+
+---
+
 ### Supabase
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_or_publishable_key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-Find these in Supabase → **Project Settings → API**.
+Get these from **Supabase → Project Settings → API**.
 
-### Admin panel (optional)
+The **service role key must only be used server-side** (website server actions / API routes and the Discord bot).
+
+---
+
+### Administration
 
 ```env
 SCHOOL_ADMIN_PASSWORD=long_random_password
 SCHOOL_ADMIN_EMAILS=you@example.com
 ADMIN_SESSION_SECRET=another_long_random_string
+```
 
-# Legacy aliases some code still reads:
+Do not use short or guessable values.
+
+Some older code paths may still accept:
+
+```env
 BLUEBIRD_ADMIN_PASSWORD=
 BLUEBIRD_ADMIN_EMAILS=
 ```
+
+Prefer the `SCHOOL_*` variables for new setups.
+
+---
 
 ### Discord
 
@@ -140,12 +233,13 @@ DISCORD_CLIENT_ID=
 DISCORD_CLIENT_SECRET=
 DISCORD_GUILD_ID=
 
-# Optional channel overrides
 DISCORD_APPLY_CHANNEL_ID=
 DISCORD_DECISIONS_CHANNEL_ID=
 DISCORD_DATABASE_CHANNEL_ID=
 DISCORD_HT_REVIEW_CHANNEL_ID=
 ```
+
+---
 
 ### Roblox
 
@@ -154,107 +248,544 @@ ROBLOX_GROUP_ID=
 ROBLOX_OPEN_CLOUD_API_KEY=
 ROBLOX_OAUTH_CLIENT_ID=
 ROBLOX_OAUTH_CLIENT_SECRET=
-ROBLOX_MERIT_API_KEY=choose_a_long_secret_for_game_server
+ROBLOX_MERIT_API_KEY=
 ROBLOX_HT_ROLE_ID=
 ```
 
-**Never put service role, bot token, or Open Cloud keys in client-side code.**
+### Keep private
+
+Never expose:
+
+- Supabase service role keys  
+- Discord bot tokens  
+- Discord client secrets  
+- Roblox Open Cloud keys  
+- Merit API keys  
+- Admin passwords  
+- Session secrets  
 
 ---
 
-## 5. Supabase setup
+## 4. Supabase setup
 
-### 5.1 Create project
+Ro-School uses Supabase for authentication, database storage and Row Level Security (RLS).
 
-1. Create a project at supabase.com  
-2. Wait until the database is ready  
+### Create your project
 
-### 5.2 Run SQL migrations
+1. Create a project in Supabase.  
+2. Wait for the database to finish provisioning.  
+3. Open **SQL Editor**.  
 
-In **SQL Editor**, run files under `supabase/migrations/` **in filename order**:
+### Run the migrations
 
+Run the files inside `supabase/migrations/` **in filename order**.
+
+Example:
+
+```text
+002_...
+003_...
+004_...
+...
+015_daily_sessions_gmt.sql
 ```
-002_…  003_…  004_…  …  015_daily_sessions_gmt.sql
-```
 
-Also run any extras you need from:
+Optional extras may live under `bot-extras/`. Only run optional SQL for features you use (for example the Discord DM queue).
 
-- `supabase/schema.sql` (if required by your tree)
-- `bot-extras/website-src/014_discord_dm_queue.sql` — DM queue for the bot  
-- `bot-extras/website-src/013_staff_database_status.sql` — staff DB review status  
+> If a migration reports that something already exists, check whether it was already applied before running it again.
 
-If a statement errors with “already exists”, you can usually continue.
+---
 
-### 5.3 Auth URLs
+## 5. Authentication
+
+Ro-School uses Supabase Auth.
+
+### Local development
 
 **Authentication → URL configuration**
 
-- **Site URL:** `http://localhost:3000` (later your production URL)  
-- **Redirect URLs:**  
-  - `http://localhost:3000/**`  
-  - `https://YOUR_VERCEL_DOMAIN/**`  
+- **Site URL:** `http://localhost:3000`  
+- **Redirect URLs:** `http://localhost:3000/**`  
 
-### 5.4 Discord OAuth provider
+### Production
 
-**Authentication → Providers → Discord**
+After deploying:
 
-- Enable Discord  
-- Client ID / Secret from Discord Developer Portal  
-- Callback URL (shown by Supabase), typically:  
-  `https://YOUR_PROJECT.supabase.co/auth/v1/callback`  
+- **Site URL:** `https://your-domain.com`  
+- **Redirect URLs:** `https://your-domain.com/**`  
 
-Add that **same** callback in Discord → OAuth2 → Redirects.
+### Discord login
 
----
+In Supabase: **Authentication → Providers → Discord**
 
-## 6. Discord app & bot
-
-### 6.1 Create application
-
-1. [Discord Developer Portal](https://discord.com/developers/applications) → New Application  
-2. **Bot** → Add Bot → copy **token** → `DISCORD_BOT_TOKEN`  
-3. **OAuth2** → copy Client ID / Secret  
-4. Enable privileged intents if your code needs them (Message Content only if you read message text)
-
-### 6.2 Invite the bot
-
-OAuth2 → URL Generator:
-
-- Scopes: `bot`, `applications.commands`  
-- Permissions: Send Messages, Embed Links, Attach Files, Read Message History, Mention Everyone, Use Application Commands  
-
-Open the URL and invite to your server. Copy the server ID → `DISCORD_GUILD_ID`.
-
-### 6.3 Channels (recommended)
-
-| Purpose | Env var |
-|---------|---------|
-| Public apply embed | `DISCORD_APPLY_CHANNEL_ID` |
-| Accept/reject + @everyone | `DISCORD_DECISIONS_CHANNEL_ID` |
-| “Add yourself to database” | `DISCORD_DATABASE_CHANNEL_ID` |
-| HT+ review | `DISCORD_HT_REVIEW_CHANNEL_ID` |
-
-Right-click channel → Copy Channel ID (Developer Mode on).
+1. Enable Discord.  
+2. Enter Client ID and Client Secret from the Discord Developer Portal.  
+3. Copy the Supabase callback URL, for example:  
+   `https://YOUR_PROJECT.supabase.co/auth/v1/callback`  
+4. Add that URL under **Discord Developer Portal → OAuth2 → Redirects**.  
 
 ---
 
-## 7. Run the website
+## 6. Discord bot
+
+The bot is a **separate process** from the website.
+
+### Create the Discord application
+
+1. Open the [Discord Developer Portal](https://discord.com/developers/applications).  
+2. Create a new application.  
+3. Open **Bot** → Add Bot → copy the token → `DISCORD_BOT_TOKEN`.  
+4. Copy the application Client ID → `DISCORD_CLIENT_ID`.  
+5. Configure OAuth2 if Discord website login is enabled.  
+
+Enable privileged intents only if the bot code requires them.
+
+### Invite the bot
+
+OAuth2 URL Generator:
+
+**Scopes**
+
+- `bot`  
+- `applications.commands`  
+
+**Permissions** (typical)
+
+- Send Messages  
+- Embed Links  
+- Attach Files  
+- Read Message History  
+- Use Application Commands  
+- Mention Everyone (only if you use decision announcements)  
+
+Invite the bot to your school server, then set:
+
+```env
+DISCORD_GUILD_ID=your_server_id
+```
+
+### Discord channels
+
+| Purpose | Environment variable |
+| --- | --- |
+| Application embed | `DISCORD_APPLY_CHANNEL_ID` |
+| Application decisions | `DISCORD_DECISIONS_CHANNEL_ID` |
+| Staff database | `DISCORD_DATABASE_CHANNEL_ID` |
+| Higher-level review | `DISCORD_HT_REVIEW_CHANNEL_ID` |
+
+Enable Developer Mode in Discord, right-click a channel → **Copy Channel ID**.
+
+---
+
+## 7. Start the website
+
+From the project root:
 
 ```bash
-# from repo root
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Useful checks:
+Check that:
 
-- Home page loads with **your** school name  
-- Register / login works  
-- Discord login (if provider configured)  
-- Staff portal only after staff permissions / Roblox rank  
+- Your school branding appears  
+- Registration works  
+- Login works  
+- The dashboard loads  
+- Discord login works (if configured)  
+- Staff permissions behave correctly  
 
-Production build test:
+### Production build
+
+```bash
+npm run build
+npm run start
+```
+
+Fix any build errors before deploying.
+
+---
+
+## 8. Start the Discord bot
+
+The Discord bot must stay running separately from Next.js.
+
+```bash
+cd bot
+npm install
+npm run register
+npm run start
+```
+
+You should see something like:
+
+```text
+[roschool-bot] Logged in as YourBot
+[dm-queue] worker started
+```
+
+### Development mode
+
+```bash
+npm run dev
+```
+
+### Test Discord DMs
+
+```text
+/testdm
+```
+
+If DMs are not working, check:
+
+1. The bot is online.  
+2. You share a server with the bot.  
+3. Discord privacy allows DMs from server members.  
+4. The Discord account is linked on the website.  
+5. Bot token and guild ID are correct.  
+
+---
+
+## 9. Roblox setup
+
+### Group
+
+```env
+ROBLOX_GROUP_ID=your_group_id
+```
+
+### Experience
+
+```env
+NEXT_PUBLIC_ROBLOX_GROUP_URL=
+NEXT_PUBLIC_ROBLOX_EXPERIENCE_URL=
+```
+
+### Roblox Open Cloud
+
+Create an API key with only the permissions you need, then:
+
+```env
+ROBLOX_OPEN_CLOUD_API_KEY=your_key
+```
+
+Keep this key server-side.
+
+### Rank mapping
+
+Configure rank → role mapping in the framework Roblox config (for example `src/lib/roblox/ranks.ts`).
+
+Example bands:
+
+```text
+Student
+Teacher
+Senior Teacher
+Senior Leadership
+Headteacher
+Administration
+```
+
+Your structure is configurable. **Permissions must be verified server-side.** Never trust a rank supplied by the Roblox client alone.
+
+---
+
+## 10. In-game systems
+
+Roblox integration lives in:
+
+```text
+roblox/
+```
+
+Read:
+
+```text
+roblox/INSTALL.md
+```
+
+A typical Studio hierarchy:
+
+```text
+ServerScriptService
+└── RoSchool
+    ├── Config
+    ├── Services
+    └── ...
+```
+
+Exact names depend on your scripts. For API-powered features:
+
+1. Set the website production URL in config.  
+2. Enable **HttpService**.  
+3. Configure the merit / API key to match the website.  
+4. Install the scripts.  
+5. Test with a staff-ranked account.  
+
+---
+
+## 11. Sessions
+
+Default timetable:
+
+```text
+Every day · 7:15 PM – 8:40 PM GMT
+```
+
+Staff can manage sessions on the website:
+
+- Create upcoming daily slots  
+- Show sessions to students  
+- Mark sessions live  
+- **Cancel** sessions  
+- Cancelled sessions are **not** auto-recreated  
+
+Optional SQL for seeding daily sessions:
+
+```text
+supabase/migrations/015_daily_sessions_gmt.sql
+```
+
+---
+
+## 12. Staff applications
+
+Typical flow:
+
+```text
+Applicant
+    │
+    ▼
+Website application
+    │
+    ▼
+Supabase
+    │
+    ▼
+Staff review
+    │
+    ├── Accepted
+    └── Rejected
+    │
+    ▼
+Discord notification
+    │
+    ▼
+Applicant DM (bot)
+```
+
+For DMs to work:
+
+- Bot process is online  
+- Applicant has linked Discord  
+- Website and bot use the same Supabase project  
+- DM queue migration is applied if your version uses it  
+
+---
+
+## 13. Deployment
+
+### Website (Vercel)
+
+1. Push the repository to GitHub (**without** secrets).  
+2. Import the project in Vercel.  
+3. Add production environment variables.  
+4. Set:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
+5. Deploy.  
+6. Update Supabase auth URLs.  
+7. Update Discord OAuth redirects.  
+8. Test login and staff permissions.  
+
+**Never upload**
+
+```text
+.env
+.env.local
+.env.production
+```
+
+Only commit the template:
+
+```text
+.env.example
+```
+
+### Discord bot hosting
+
+The bot is a long-running process. Do **not** run it as a normal Vercel serverless function.
+
+Host options:
+
+- Railway  
+- Render  
+- Fly.io  
+- A VPS  
+- Your own server  
+- Your PC for development  
+
+```bash
+cd bot
+npm run start
+```
+
+In production, use a process manager (PM2, systemd, etc.) where appropriate.
+
+---
+
+## 14. Security
+
+### Never expose
+
+```text
+SUPABASE_SERVICE_ROLE_KEY
+DISCORD_BOT_TOKEN
+DISCORD_CLIENT_SECRET
+ROBLOX_OPEN_CLOUD_API_KEY
+ROBLOX_MERIT_API_KEY
+ADMIN_SESSION_SECRET
+```
+
+### Permissions
+
+Staff permissions must be checked on the **server**.
+
+Do not rely on:
+
+- Client-side role checks  
+- Hidden buttons alone  
+- Frontend variables  
+- User-supplied permissions  
+
+Hiding a button does not stop someone calling an API.
+
+### Supabase
+
+Keep RLS enabled on user-facing tables. Review policies before going public.
+
+---
+
+## 15. Pre-launch checklist
+
+- [ ] Website builds successfully  
+- [ ] Authentication works  
+- [ ] Production OAuth redirects are configured  
+- [ ] Supabase RLS is enabled  
+- [ ] Staff permissions are server-side  
+- [ ] Discord bot is online  
+- [ ] Discord commands work  
+- [ ] Application flow works  
+- [ ] Application DMs work  
+- [ ] Roblox integration works  
+- [ ] Merit system works (if enabled)  
+- [ ] `.env` files are ignored by Git  
+- [ ] No secrets in Git history  
+- [ ] Production domain is configured  
+- [ ] RP notice is visible  
+- [ ] Roblox and Discord links are correct  
+
+---
+
+## 16. Troubleshooting
+
+| Problem | Check |
+| --- | --- |
+| Website will not build | Run `npm run build` locally and fix errors |
+| Discord login fails | Supabase Discord provider + OAuth redirect URL |
+| Production login goes to localhost | `NEXT_PUBLIC_SITE_URL` must be the production URL |
+| Staff portal inaccessible | Rank mapping and server-side permissions |
+| Roblox API fails | Open Cloud key and scopes |
+| Merits do not work | HttpService, API URL, merit key |
+| Application DM not sent | Bot online, Discord linked, DM privacy, service role on bot |
+| Sessions not appearing | Migrations, Staff → Sessions, permissions |
+| Slash commands missing | `npm run register` in `bot/` |
+| Bot “Missing Access” | Bot in guild, correct `DISCORD_GUILD_ID` / Client ID |
+| Supabase requests fail | URL, publishable key, RLS policies |
+| Env vars seem missing | Restart dev server after editing `.env.local` |
+
+Always check logs first:
+
+```text
+Vercel
+Supabase
+Discord bot terminal
+Roblox Studio Output
+Browser console
+```
+
+Do not randomly change config until you know which component failed.
+
+---
+
+## 17. Project structure
+
+```text
+Framework/
+├── README.md
+├── .env.example
+├── package.json
+│
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── dashboard/
+│   │   ├── staff/
+│   │   └── ...
+│   ├── components/
+│   └── lib/
+│       ├── auth/
+│       ├── supabase/
+│       ├── roblox/
+│       ├── discord/
+│       ├── sessions/
+│       └── merits/
+│
+├── supabase/
+│   ├── migrations/
+│   └── schema.sql
+│
+├── bot/
+│   ├── .env.example
+│   ├── package.json
+│   ├── README.md
+│   └── src/
+│
+├── roblox/
+│   ├── INSTALL.md
+│   └── ...
+│
+└── bot-extras/
+    └── ...
+```
+
+---
+
+## Quick start
+
+If Supabase, Discord and env files are already configured:
+
+### Website
+
+```bash
+npm install
+npm run dev
+```
+
+### Discord bot
+
+```bash
+cd bot
+npm install
+npm run register
+npm run start
+```
+
+### Production website build
 
 ```bash
 npm run build
@@ -263,224 +794,26 @@ npm run start
 
 ---
 
-## 8. Run the Discord bot
+## Licence and responsibility
 
-The bot is a **separate long-running process** (not Vercel serverless).
+Ro-School is intended for **Roblox roleplay and community projects**.
 
-```bash
-cd bot
-# ensure bot/.env is filled (same Supabase service role as website)
-npm install
-npm run register
-npm run start
-```
+You are responsible for your own community, including:
 
-Expected logs:
+- Roblox and Discord compliance  
+- Privacy and data handling  
+- Moderation and staff access  
+- Community rules  
+- Notices shown to members  
 
-```
-[roschool-bot] Logged in as YourBot#1234
-[dm-queue] worker started ...
-```
-
-### Test DMs
-
-In Discord:
-
-```
-/testdm
-```
-
-If it fails:
-
-1. Privacy → allow DMs from server members  
-2. You must share a server with the bot  
-3. Bot token and guild ID are correct  
-
-### Bot scripts
-
-| Command | Purpose |
-|---------|---------|
-| `npm run register` | Register slash commands to the guild |
-| `npm run start` | Run bot |
-| `npm run dev` | Run with auto-reload |
+Ro-School does **not** make your Roblox community a real-world registered school.
 
 ---
 
-## 9. Roblox setup
+## Contributing
 
-### 9.1 Group & experience
+Pull requests, bug reports and improvements are welcome.
 
-1. Create a Roblox group → put ID in `ROBLOX_GROUP_ID`  
-2. Create/publish your school experience  
-3. Set `NEXT_PUBLIC_ROBLOX_GROUP_URL` and `NEXT_PUBLIC_ROBLOX_EXPERIENCE_URL`  
+When adding features, keep them modular and configurable so they work across different Ro-School communities rather than being hard-coded for one school.
 
-### 9.2 Open Cloud
-
-1. Create an API key with the scopes you need (group membership / ranks as required)  
-2. Set `ROBLOX_OPEN_CLOUD_API_KEY`  
-
-### 9.3 Rank → role mapping
-
-Edit `src/lib/roblox/ranks.ts` (or your ranks config) so Roblox ranks map to bands (student, staff, SLT, HT, etc.).
-
-Permissions are enforced **server-side** from verified group rank + staff tables — not from the client.
-
-### 9.4 In-game merits
-
-See `roblox/INSTALL.md` and scripts in `roblox/`.
-
-Typical flow:
-
-1. Place ModuleScripts / Scripts under ServerScriptService  
-2. Set `Config.ApiBaseUrl` to your **live** website URL  
-3. Set the same merit API key as `ROBLOX_MERIT_API_KEY`  
-4. Enable **HttpService** in the experience  
-5. Staff with group rank use the merit GUI; server calls your website API  
-
-Some scripts may still use older “Bluebird” folder names — rename folders in Studio to match the script, or edit the script names to match your hierarchy.
-
----
-
-## 10. Sessions timetable
-
-Default:
-
-- **Every day · 7:15 pm – 8:40 pm GMT**
-
-Behaviour:
-
-- **Staff → Sessions** ensures the next **14 days** of daily slots  
-- Staff with `sessions.cancel` can **Cancel** a session  
-- Cancelled sessions are **not** auto-recreated  
-- Students see upcoming scheduled/live sessions under **Dashboard → Sessions**  
-
-Optional SQL seed (30 days): `supabase/migrations/015_daily_sessions_gmt.sql`.
-
----
-
-## 11. Staff applications & DMs
-
-Flow:
-
-1. Applicant applies on the website  
-2. Staff sets status **Accepted** or **Rejected**  
-3. Decisions channel can announce; database channel explains staff DB form  
-4. **Bot** sends the applicant a **DM** (queue + application poll)  
-
-Requirements for DMs:
-
-- Bot process **running**  
-- Applicant has **linked Discord** on the website  
-- `/testdm` works for that user  
-- `014_discord_dm_queue.sql` applied (recommended)  
-- Website and bot share the same Supabase project  
-
----
-
-## 12. Deploy (Vercel + bot host)
-
-### Website (Vercel)
-
-1. Push repo to GitHub (**no** `.env.local`)  
-2. Import project in Vercel  
-3. Add **all** production env vars from `.env.example`  
-4. Set `NEXT_PUBLIC_SITE_URL` to `https://your-domain.vercel.app`  
-5. Deploy  
-6. Update Supabase Site URL + Redirect URLs to production  
-7. Update Discord OAuth redirects if needed  
-
-### Bot (must stay online)
-
-Deploy `bot/` to e.g.:
-
-- Railway / Render / Fly.io **worker**  
-- A VPS with `npm run start` under systemd/pm2  
-- Your PC only for testing  
-
-Set the same Discord + Supabase env vars on that host.
-
-Vercel **cannot** reliably host the Discord gateway bot.
-
----
-
-## 13. Permissions & security
-
-- Service role key: **server and bot only**  
-- Discord bot token: **bot host only**  
-- Roblox Open Cloud / merit keys: **server only**  
-- RLS should stay **enabled** on user data tables  
-- Staff power should come from **Roblox rank + server checks**, not client claims  
-
-### Before going public
-
-- [ ] Secrets rotated if they were ever pasted in chat  
-- [ ] `.env*` gitignored (except `.env.example`)  
-- [ ] Supabase redirects limited to real domains  
-- [ ] Bot invited only to your school server  
-- [ ] RP notice visible where appropriate  
-
----
-
-## 14. Troubleshooting
-
-| Problem | What to check |
-|---------|----------------|
-| Build fails on Vercel | Local `npm run build`; fix TS/lint; don’t typecheck the bot from the Next app if excluded |
-| Discord login fails | Supabase Discord provider; redirect URL = Supabase callback; Site URL |
-| OAuth goes to localhost in production | `NEXT_PUBLIC_SITE_URL` must be production URL |
-| Staff portal redirects away | User has no staff permission / Roblox rank not mapped |
-| Merits fail in-game | HttpService on; correct `ApiBaseUrl`; merit API key matches; staff rank check |
-| No accept DM | Bot online; `/testdm`; Discord linked; DM privacy; service role on bot |
-| Sessions empty | Open Staff → Sessions once; run `015_…` SQL; permissions |
-| “Missing Access” on `register` | Bot not in guild, or wrong `DISCORD_GUILD_ID` / Client ID |
-
----
-
-## 15. Project structure
-
-```
-/
-├── README.md                 ← this guide
-├── .env.example              ← website env template
-├── package.json              ← Next.js app
-├── src/
-│   ├── app/                  ← pages (public, dashboard, staff, admin, api)
-│   ├── components/
-│   └── lib/                  ← auth, supabase, roblox, discord, sessions, merits…
-├── supabase/
-│   ├── migrations/           ← run in order
-│   └── schema.sql
-├── roblox/                   ← in-experience Lua + install notes
-├── bot/                      ← Discord bot
-│   ├── README.md
-│   ├── .env.example
-│   └── src/
-└── bot-extras/               ← optional SQL + website hooks for bot features
-```
-
----
-
-## Quick command cheat sheet
-
-```bash
-# Website
-npm install
-cp .env.example .env.local   # then edit
-npm run dev
-npm run build && npm run start
-
-# Bot
-cd bot
-npm install
-cp .env.example .env         # then edit
-npm run register
-npm run start
-```
-
----
-
-## Licence / responsibility
-
-Adapt this framework for your own community. You are responsible for Roblox, Discord, and privacy compliance for your members.
-
-If something fails, check **logs** (Vercel, Supabase, bot terminal) before changing random config.
+**Build the framework once. Configure it for your school.**
